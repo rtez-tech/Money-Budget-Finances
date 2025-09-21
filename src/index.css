@@ -8,35 +8,56 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Financial App Design System */
+    --background: 220 20% 98%;
+    --foreground: 160 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 160 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 160 15% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Financial Green - Growth & Money */
+    --primary: 160 80% 25%;
+    --primary-foreground: 0 0% 98%;
+    --primary-light: 160 60% 40%;
+    --primary-glow: 160 70% 35%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Trust Blue - Stability */
+    --secondary: 200 70% 40%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Success Gold */
+    --success: 45 85% 55%;
+    --success-foreground: 160 15% 15%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 220 20% 95%;
+    --muted-foreground: 160 10% 50%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 200 50% 92%;
+    --accent-foreground: 200 70% 25%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --destructive: 0 80% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --radius: 0.5rem;
+    --border: 220 15% 88%;
+    --input: 220 15% 94%;
+    --ring: 160 80% 25%;
+
+    /* Financial Gradients */
+    --gradient-financial: linear-gradient(135deg, hsl(160, 80%, 25%), hsl(200, 70%, 40%));
+    --gradient-success: linear-gradient(135deg, hsl(160, 60%, 40%), hsl(45, 85%, 55%));
+    --gradient-card: linear-gradient(145deg, hsl(0, 0%, 100%), hsl(220, 20%, 98%));
+    
+    /* Shadows */
+    --shadow-financial: 0 10px 25px -5px hsl(160, 80%, 25% / 0.1);
+    --shadow-success: 0 0 30px hsl(45, 85%, 55% / 0.2);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
