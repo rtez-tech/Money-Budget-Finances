@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { OnboardingChecklist } from "@/components/OnboardingChecklist";
 import { BudgetTracker } from "@/components/BudgetTracker";
 import { DebtTracker } from "@/components/DebtTracker";
@@ -14,12 +16,43 @@ import {
   Menu,
   Bell,
   User,
-  Settings
+  Settings,
+  LogOut
 } from "lucide-react";
 import financialHero from "@/assets/financial-hero.jpg";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="p-3 bg-gradient-financial rounded-lg inline-block mb-4">
+            <DollarSign className="w-8 h-8 text-primary-foreground animate-pulse" />
+          </div>
+          <p className="text-muted-foreground">Loading your financial dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,6 +80,9 @@ const Index = () => {
               <Button variant="ghost" size="icon">
                 <User className="w-4 h-4" />
               </Button>
+              <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4" />
+              </Button>
             </div>
           </div>
         </div>
@@ -71,20 +107,9 @@ const Index = () => {
             and financial education all in one place.
           </p>
           <div className="flex justify-center space-x-4">
-            <Button 
-              size="lg" 
-              variant="secondary"
-              className="shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              Get Started Free
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20 shadow-lg"
-            >
-              Watch Demo
-            </Button>
+            <div className="text-primary-foreground/90">
+              Welcome back, {user.user_metadata?.display_name || user.email?.split('@')[0]}!
+            </div>
           </div>
         </div>
       </section>
