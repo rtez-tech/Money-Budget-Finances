@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { OnboardingChecklist } from "@/components/OnboardingChecklist";
 import { BudgetTracker } from "@/components/BudgetTracker";
 import { DebtTracker } from "@/components/DebtTracker";
@@ -35,12 +35,7 @@ const Index = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="p-3 bg-gradient-financial rounded-lg inline-block mb-4">
-            <DollarSign className="w-8 h-8 text-primary-foreground animate-pulse" />
-          </div>
-          <p className="text-muted-foreground">Loading your financial dashboard...</p>
-        </div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -48,11 +43,6 @@ const Index = () => {
   if (!user) {
     return null;
   }
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/auth");
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,7 +70,7 @@ const Index = () => {
               <Button variant="ghost" size="icon">
                 <User className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={handleSignOut}>
+              <Button variant="ghost" size="icon" onClick={signOut}>
                 <LogOut className="w-4 h-4" />
               </Button>
             </div>
@@ -107,9 +97,22 @@ const Index = () => {
             and financial education all in one place.
           </p>
           <div className="flex justify-center space-x-4">
-            <div className="text-primary-foreground/90">
-              Welcome back, {user.user_metadata?.display_name || user.email?.split('@')[0]}!
-            </div>
+            <Button 
+              size="lg" 
+              variant="secondary"
+              className="shadow-lg hover:shadow-xl transition-all duration-300"
+              onClick={() => setActiveTab("budget")}
+            >
+              Start Budgeting
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20 shadow-lg"
+              onClick={() => setActiveTab("learn")}
+            >
+              Learn More
+            </Button>
           </div>
         </div>
       </section>
@@ -205,6 +208,7 @@ const Index = () => {
               size="lg" 
               variant="secondary"
               className="shadow-lg hover:shadow-xl transition-all duration-300"
+              onClick={() => setActiveTab("budget")}
             >
               Start Your Journey
             </Button>
@@ -212,6 +216,7 @@ const Index = () => {
               size="lg" 
               variant="outline"
               className="bg-white/10 border-white/20 text-white hover:bg-white/20 shadow-lg"
+              onClick={() => setActiveTab("learn")}
             >
               View Success Stories
             </Button>
