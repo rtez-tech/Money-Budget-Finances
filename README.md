@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/32f526c0-d026-4bac-8ae2-b9c856866fcc
+**URL**: https://moneyfinance.lovable.app/auth
 
 ## How can I edit this code?
 
