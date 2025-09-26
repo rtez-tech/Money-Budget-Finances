@@ -2,78 +2,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, Building, Car, GraduationCap, Target, TrendingDown } from "lucide-react";
-
-interface Debt {
-  id: string;
-  name: string;
-  balance: number;
-  originalAmount: number;
-  interestRate: number;
-  minPayment: number;
-  icon: React.ReactNode;
-  type: 'credit-card' | 'loan' | 'mortgage' | 'student';
-}
+import { CreditCard, Target, TrendingDown } from "lucide-react";
+import { useDebts } from "@/hooks/useDebts";
+import { EditDebtDialog } from "@/components/EditDebtDialog";
+import { AddDebtDialog } from "@/components/AddDebtDialog";
 
 export const DebtTracker = () => {
-  const debts: Debt[] = [
-    {
-      id: "credit-1",
-      name: "Chase Freedom",
-      balance: 3200,
-      originalAmount: 5000,
-      interestRate: 18.99,
-      minPayment: 85,
-      icon: <CreditCard className="w-5 h-5" />,
-      type: 'credit-card',
-    },
-    {
-      id: "credit-2",
-      name: "Capital One",
-      balance: 1800,
-      originalAmount: 3000,
-      interestRate: 22.49,
-      minPayment: 55,
-      icon: <CreditCard className="w-5 h-5" />,
-      type: 'credit-card',
-    },
-    {
-      id: "car-loan",
-      name: "Auto Loan",
-      balance: 12500,
-      originalAmount: 18000,
-      interestRate: 5.99,
-      minPayment: 320,
-      icon: <Car className="w-5 h-5" />,
-      type: 'loan',
-    },
-    {
-      id: "student-loan",
-      name: "Student Loan",
-      balance: 8500,
-      originalAmount: 15000,
-      interestRate: 4.5,
-      minPayment: 180,
-      icon: <GraduationCap className="w-5 h-5" />,
-      type: 'student',
-    },
-  ];
+  const { debts, loading, addDebt, updateDebt, deleteDebt } = useDebts();
+
+  if (loading) {
+    return (
+      <Card className="bg-gradient-card border-border/50 shadow-financial">
+        <CardContent className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const totalDebt = debts.reduce((sum, debt) => sum + debt.balance, 0);
-  const totalOriginal = debts.reduce((sum, debt) => sum + debt.originalAmount, 0);
-  const totalMinPayments = debts.reduce((sum, debt) => sum + debt.minPayment, 0);
-  const totalPaidOff = totalOriginal - totalDebt;
-  const progressPercentage = (totalPaidOff / totalOriginal) * 100;
-
-  const getDebtTypeColor = (type: string) => {
-    switch (type) {
-      case 'credit-card': return 'bg-red-500';
-      case 'loan': return 'bg-blue-500';
-      case 'student': return 'bg-green-500';
-      case 'mortgage': return 'bg-purple-500';
-      default: return 'bg-gray-500';
-    }
-  };
+  const totalMinPayments = debts.reduce((sum, debt) => sum + debt.minimum_payment, 0);
+  
+  // For progress calculation, we need to estimate original amounts
+  // Since we don't have original amounts in the database, we'll use balance * 1.5 as an estimate
+  const estimatedOriginalTotal = debts.reduce((sum, debt) => sum + (debt.balance * 1.5), 0);
+  const estimatedPaidOff = estimatedOriginalTotal - totalDebt;
+  const progressPercentage = estimatedOriginalTotal > 0 ? (estimatedPaidOff / estimatedOriginalTotal) * 100 : 0;
 
   const getInterestRateColor = (rate: number) => {
     if (rate >= 20) return 'destructive';
@@ -84,10 +38,13 @@ export const DebtTracker = () => {
   return (
     <Card className="bg-gradient-card border-border/50 shadow-financial">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-foreground flex items-center space-x-2">
-          <Target className="w-6 h-6 text-primary" />
-          <span>Debt Elimination Tracker</span>
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-2xl font-bold text-foreground flex items-center space-x-2">
+            <Target className="w-6 h-6 text-primary" />
+            <span>Debt Elimination Tracker</span>
+          </CardTitle>
+          <AddDebtDialog onAdd={addDebt} />
+        </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
           <div className="text-center">
@@ -98,9 +55,9 @@ export const DebtTracker = () => {
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-success">
-              ${totalPaidOff.toLocaleString()}
+              ${estimatedPaidOff.toLocaleString()}
             </p>
-            <p className="text-sm text-muted-foreground">Paid Off</p>
+            <p className="text-sm text-muted-foreground">Est. Paid Off</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-primary">
@@ -126,58 +83,74 @@ export const DebtTracker = () => {
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {debts.map((debt) => {
-          const paidOffAmount = debt.originalAmount - debt.balance;
-          const debtProgress = (paidOffAmount / debt.originalAmount) * 100;
-          
-          return (
-            <div key={debt.id} className="p-4 border border-border/50 rounded-lg bg-card">
-              <div className="items-center justify-between space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${getDebtTypeColor(debt.type)} text-white`}>
-                      {debt.icon}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">
-                        {debt.name}
-                      </h3>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Badge variant={getInterestRateColor(debt.interestRate)}>
-                          {debt.interestRate}% APR
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          Min: ${debt.minPayment}/mo
-                        </span>
+        {debts.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground mb-4">No debts added yet. Start by adding your first debt to track your progress.</p>
+            <AddDebtDialog onAdd={addDebt} />
+          </div>
+        ) : (
+          debts.map((debt) => {
+            // Estimate original amount as balance * 1.5 for progress calculation
+            const estimatedOriginal = debt.balance * 1.5;
+            const estimatedPaidOff = estimatedOriginal - debt.balance;
+            const debtProgress = (estimatedPaidOff / estimatedOriginal) * 100;
+            
+            return (
+              <div key={debt.id} className="p-4 border border-border/50 rounded-lg bg-card">
+                <div className="items-center justify-between space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                        <CreditCard className="w-5 h-5" />
                       </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground">
+                          {debt.name}
+                        </h3>
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Badge variant={getInterestRateColor(debt.interest_rate)}>
+                            {debt.interest_rate}% APR
+                          </Badge>
+                          <span className="text-sm text-muted-foreground">
+                            Min: ${debt.minimum_payment}/mo
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-destructive">
+                          ${debt.balance.toLocaleString()}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          current balance
+                        </p>
+                      </div>
+                      <EditDebtDialog
+                        debt={debt}
+                        onUpdate={updateDebt}
+                        onDelete={deleteDebt}
+                      />
                     </div>
                   </div>
                   
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-destructive">
-                      ${debt.balance.toLocaleString()}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      of ${debt.originalAmount.toLocaleString()}
-                    </p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">
+                        Est. ${estimatedPaidOff.toLocaleString()} paid off
+                      </span>
+                      <span className="text-sm font-medium text-success">
+                        {Math.round(debtProgress)}% progress
+                      </span>
+                    </div>
+                    <Progress value={debtProgress} className="h-2" />
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">
-                      ${paidOffAmount.toLocaleString()} paid off
-                    </span>
-                    <span className="text-sm font-medium text-success">
-                      {Math.round(debtProgress)}% complete
-                    </span>
-                  </div>
-                  <Progress value={debtProgress} className="h-2" />
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
 
         <div className="mt-6 p-4 bg-primary/5 border border-primary/10 rounded-lg">
           <div className="flex items-center space-x-3 mb-3">

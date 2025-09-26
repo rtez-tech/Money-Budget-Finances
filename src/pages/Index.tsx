@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useFinancialData } from "@/hooks/useFinancialData";
 import { OnboardingChecklist } from "@/components/OnboardingChecklist";
 import { BudgetTracker } from "@/components/BudgetTracker";
 import { DebtTracker } from "@/components/DebtTracker";
@@ -24,6 +25,7 @@ import financialHero from "@/assets/financial-hero.jpg";
 const Index = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const { user, loading, signOut } = useAuth();
+  const financialData = useFinancialData();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -123,29 +125,29 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <ProgressCard
             title="Monthly Budget"
-            current={2510}
-            target={3150}
+            current={financialData.monthlyBudget.current}
+            target={financialData.monthlyBudget.target}
             icon={<DollarSign className="w-5 h-5 text-primary" />}
             format="currency"
           />
           <ProgressCard
             title="Emergency Fund"
-            current={3500}
-            target={15000}
+            current={financialData.emergencyFund.current}
+            target={financialData.emergencyFund.target}
             icon={<PiggyBank className="w-5 h-5 text-primary" />}
             format="currency"
           />
           <ProgressCard
             title="Debt Payoff"
-            current={15200}
-            target={26000}
+            current={financialData.debtPayoff.current}
+            target={financialData.debtPayoff.target}
             icon={<Target className="w-5 h-5 text-primary" />}
             format="currency"
           />
           <ProgressCard
             title="Financial Score"
-            current={72}
-            target={100}
+            current={financialData.financialScore.current}
+            target={financialData.financialScore.target}
             icon={<TrendingUp className="w-5 h-5 text-primary" />}
             format="number"
           />
